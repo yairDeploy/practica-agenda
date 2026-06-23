@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{{ titulo }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}"/>
+</head>
+<body>
+    <div class="bg-dark text-white w-100 py-2 mt-0">
+        <h5 class="mt-0 pl-4">{{ encabezado }}</h5>
+    </div>
+    
+    <div class="row">
+        <div class="offset-md-2 col-md-8 col-sm-12 mt-4">
+            <div class="card">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link active" id="tab-contacto" onclick="cargarTab('contacto', {{ contacto.id }}); return false;">
+                                Contacto
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab-direccion" onclick="cargarTab('direccion', {{ contacto.id }}); return false;">
+                                Dirección
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" id="tab-telefono" onclick="cargarTab('telefono', {{ contacto.id }}); return false;">
+                                Teléfonos
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div  class="card-body" id="tab-content">
+                    {% include 'tabs/contacto_tab.html' %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        let tab = "{{ tab|default:'contacto' }}";
+        cargarTab(tab, {{ contacto.id }});
+    
+        function cargarTab(tab, contactoId) {
+            document.getElementById('tab-contacto').classList.remove('active');
+            document.getElementById('tab-direccion').classList.remove('active');
+            document.getElementById('tab-telefono').classList.remove('active');
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            
+            fetch(`/cargar-tab/${contactoId}/${tab}/`)
+                .then(response => response.text())
+                .then(html => {
+                    document.getElementById('tab-content').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('tab-content').innerHTML = '<div class="alert alert-danger">Error al cargar la pestaña</div>';
+                });
+            if (tab === 'direccion') {
+                document.querySelector('input[name="contacto"]').value = contactoId;
+            }
+        }
+    </script>
+
+    <script src="{% static 'js/telefono_forms.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.js' %}"></script>
+</body>
+</html>
