@@ -1,0 +1,27 @@
+<div id="direccionContent">
+    <h5>
+        {% if direccion %}
+            Editar Dirección
+        {% else %}
+            Agregar Dirección
+        {% endif %}
+    </h5>
+    
+    <form method="POST" action="{% url 'direccion' %}">
+        {% csrf_token %}
+
+        {{ form.as_p }}
+        <div class="text-right">
+            <button type="submit" class="btn btn-primary">
+                {% if direccion %}
+                    Actualizar Dirección
+                {% else %}
+                    Guardar Dirección
+                {% endif %}
+            </button>
+            <a href="{% url 'inicio'%}" class="btn btn-secondary">
+                Volver
+            </a>
+        </div>
+    </form>
+</div>
