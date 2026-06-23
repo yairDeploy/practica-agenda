@@ -45,7 +45,7 @@ TIPOS_TELEFONO = (
 class Contacto(models.Model):
     nombre = models.CharField(max_length=60)
     apellidos = models.CharField(max_length=120)
-    fotografia = models.ImageField()
+    fotografia = models.ImageField(upload_to='contacto/')
     fecha_nacio = models.DateField(default=None, null=True, blank=True)
 
     class Meta:
