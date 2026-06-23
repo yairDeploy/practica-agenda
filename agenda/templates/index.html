@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ title }}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <style>
+        .btn-options {
+            padding: 0.1rem 0.2rem;
+            font-size: 0.75rem;
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="bg-dark text-white w-100 py-2 mt-0">
+        <h5 class="mt-0 pl-4">{{ encabezado }}</h5>
+    </div>
+    <div class="row">
+        <div class="offset-2 col-8">
+            <div class="d-flex justify-content-end mt-4">
+                <a href="{% url 'crear_contacto' %}" class="btn btn-primary">Agregar Contacto</a>
+            </div>
+            <div class="container mt-3">
+                <div class="row">
+                    {% for contacto in contactos %}
+                        <div class="col-12 col-sm-6 col-md-4 col-lg-3 mb-4">
+                            <div class="card h-100 shadow-sm">
+                                <div class="card-header bg-light text-center p-3">
+                                    {% if contacto.fotografia %}
+                                        <img src="{{ contacto.fotografia.url }}" 
+                                            alt="fotografia de {{ contacto.nombre }}" 
+                                            class="rounded-circle" 
+                                            width="80" height="80" 
+                                            style="object-fit: cover;">
+                                    {% else %}
+                                        <div class="bg-secondary text-white rounded-circle d-inline-flex align-items-center justify-content-center" 
+                                            style="width: 80px; height: 80px; font-size: 28px; font-weight: bold;">
+                                            {{ contacto.nombre|slice:":1" }}{{ contacto.apellidos|slice:":1" }}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body text-center">
+                                    <h5 class="card-title mb-1">{{ contacto.nombre }} {{ contacto.apellidos }}</h5>
+                                </div>
+                                
+                                
+                                <div class="card-footer bg-white border-top-0 d-flex justify-content-around">
+                                    <a class="btn btn-options btn-primary" href="{% url 'editar_contacto' contacto.id %}">
+                                        <i class="fas fa-edit"></i> Editar
+                                    </a>
+                                    <button class="btn btn-options btn-danger" onclick="confirmarEliminacion({{ contacto.id }})">
+                                        <i class="fas fa-trash"></i> Eliminar
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <div class="alert alert-info text-center">
+                                No hay contactos disponibles
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="miModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalLabel">Confirmación</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Cerrar">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body" id="modalBody">
+                    ¿Está seguro de que desea eliminar este contacto?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" id="btnGuardarModal">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="{% static 'jquery/jquery-3.6.0.min.js' %}"></script>
+    <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
+    <script>
+        function confirmarEliminacion(contactoId) {
+            const btnGuardarModal = document.getElementById('btnGuardarModal');
+            btnGuardarModal.addEventListener('click', function() {
+                eliminarContacto(contactoId);
+            });
+            const modalElement = document.getElementById('miModal');
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+        }
+        function eliminarContacto(id) {
+            fetch(`/${id}/eliminar`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                } else {
+                    alert("Error al eliminar el contacto.");
+                }
+            });
+        }
+    </script>
+</body>
+</html>
