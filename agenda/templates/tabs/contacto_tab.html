@@ -11,16 +11,6 @@
                     <div class="alert alert-danger">{{ field.errors }}</div>
                 {% endif %}
             </div>
-            
-            {% if field.name == 'fotografia' and contacto.fotografia %}
-                <div class="mb-3">
-                    <div>
-                        <a href="{{ contacto.fotografia.url }}" target="_blank">
-                            Fotografía actual
-                        </a>
-                    </div>
-                </div>
-            {% endif %}
         {% endfor %}
         <div class="text-right">
             <button type="submit" class="btn btn-primary">
